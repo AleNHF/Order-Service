@@ -16,7 +16,8 @@ return new class extends Migration
             $table->decimal('total')->nullable();
             $table->unsignedInteger('qtyOrdered')->nullable();
             $table->string('status');
-            $table->date('deliveryDate');
+            $table->date('deliveryDate')->nullable();
+            $table->date('applicationDate')->nullable();
             $table->unsignedBigInteger('userId');
             $table->unsignedBigInteger('supplierId');
             $table->timestamps();

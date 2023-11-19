@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderDetail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -53,6 +54,7 @@ class OrderController extends Controller
             $order = new Order();
             $order->status = $request->status;
             $order->deliveryDate = $request->deliveryDate;
+            $order->applicationDate = Carbon::now();
             $order->userId = $request->userId;
             $order->supplierId = $request->supplierId;
             $order->save();
