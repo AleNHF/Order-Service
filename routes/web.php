@@ -30,4 +30,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('/orders', 'OrderController@store');
     $router->put('/orders/{id}', 'OrderController@update');
     $router->delete('/orders/{id}', 'OrderController@destroy');
+    $router->get('/order/tiempo-ciclo-compra', 'OrderController@tiempoCicloCompras');
 });

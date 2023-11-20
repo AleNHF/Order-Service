@@ -193,4 +193,27 @@ class OrderController extends Controller
             return response()->json(['error' => 'Error al eliminar la orden', 'mensaje' => $e->getMessage()], 500);
         }
     }
+
+    public function tiempoCicloCompras()
+    {
+        try {
+            $ordenesConFechas = Order::whereNotNull('applicationDate')->whereNotNull('deliveryDate')->get();
+
+            if ($ordenesConFechas->isEmpty()) {
+                return response()->json(['error' => 'No hay datos disponibles para calcular el tiempo de ciclo de compras.']);
+            }
+
+            $tiemposCiclo = $ordenesConFechas->map(function ($orden) {
+                $fechaSolicitud = Carbon::parse($orden->applicationDate);
+                $fechaEntrega = Carbon::parse($orden->deliveryDate);
+                return $fechaEntrega->diffInDays($fechaSolicitud);
+            });
+
+            $promedioTiempoCiclo = $tiemposCiclo->avg();
+
+            return response()->json(['promedio_tiempo_ciclo_compras' => $promedioTiempoCiclo]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al calcular el tiempo de ciclo de compras.', 'mensaje' => $e->getMessage()]);
+        }
+    }
 }

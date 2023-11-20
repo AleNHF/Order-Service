@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->decimal('total')->nullable();
             $table->unsignedInteger('qtyOrdered')->nullable();
-            $table->string('status');
-            $table->date('deliveryDate')->nullable();
-            $table->date('applicationDate')->nullable();
-            $table->unsignedBigInteger('userId');
-            $table->unsignedBigInteger('supplierId');
+            $table->string('status')->nullable();
+            $table->date('deliveryDate')->nullable(); //fecha de entrega
+            $table->date('applicationDate')->nullable(); //fecha de solicitud
+            $table->unsignedBigInteger('userId')->default(2);
+            $table->unsignedBigInteger('supplierId')->nullable();
             $table->timestamps();
 
             $table->foreign('supplierId')->references('id')->on('suppliers');
