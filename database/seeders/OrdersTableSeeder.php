@@ -7,6 +7,7 @@ use App\Models\OrderDetail;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Carbon\Carbon;
 
 class OrdersTableSeeder extends Seeder
 {
@@ -18,30 +19,30 @@ class OrdersTableSeeder extends Seeder
         $faker = Faker::create();
 
         Order::factory(1000)->create()->each(function ($order) use ($faker) {
-            // Mover la generación aleatoria de 'status' dentro del bucle each
+            $applicationDate = $faker->dateTimeBetween('2020-01-01', '2023-12-31')->format('Y-m-d');
+            $deliveryDate = Carbon::createFromFormat('Y-m-d', $applicationDate)->addDays($faker->randomElement([3, 5]))->format('Y-m-d');
+
             $order->update([
                 'status' => $faker->randomElement(['pending', 'shipped', 'delivered']),
-                'deliveryDate' => $faker->date,
-                'applicationDate' => $faker->date,
+                'deliveryDate' => $deliveryDate,
+                'applicationDate' => $applicationDate,
                 'supplierId' => $faker->numberBetween(1, 20),
             ]);
 
             $numberOfDetails = rand(1, 10);
 
-            // Para cada orden, crea un número aleatorio de detalles
             for ($i = 0; $i < $numberOfDetails; $i++) {
                 $price = $faker->randomFloat(2, 1, 50);
-                $quantity = $faker->numberBetween(1, 500);
+                $quantity = $faker->numberBetween(1, 200);
                 OrderDetail::factory()->create([
                     'price' => $price,
                     'quantity' => $quantity,
                     'total' => $price * $quantity,
-                    'productId' => $faker->numberBetween(1, 800), //String id
+                    'productId' => str_pad($faker->numberBetween(1, 111), 6, '0', STR_PAD_LEFT),
                     'orderId' => $order->id,
                 ]);
             }
 
-            // Actualizar la orden con el total y la cantidad de todos los detalles
             $order->update([
                 'total' => $order->details->sum('total'),
                 'qtyOrdered' => $order->details->sum('quantity'),
