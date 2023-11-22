@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 
 class OrderController extends Controller
 {
@@ -102,8 +103,6 @@ class OrderController extends Controller
         $rules = [
             'deliveryDate' => 'required',
             'status' => 'required',
-            'userId' => 'required',
-            'supplierId' => 'required',
             'details' => 'required|array|min:1',
             'details.*.product_id' => 'required',
             'details.*.quantity' => 'required',
@@ -136,6 +135,8 @@ class OrderController extends Controller
 
             $total = 0;
             $quantity = 0;
+            $orderDetailsArray = [];
+            $payload = [];
 
             foreach ($request->input('details') as $detail) {
                 $orderDetail = $order->orderDetails()->create([
@@ -154,6 +155,22 @@ class OrderController extends Controller
                     'price' => $orderDetail->price,
                     'total' => $orderDetail->total,
                 ];
+
+                $payload[] = [
+                    'product_id' => $orderDetail->productId,
+                    'quantity' => $orderDetail->quantity,
+                ];
+            }
+
+            if ($order->status === 'delivered') {
+                $response = Http::post('http://ruta-del-microservicio-de-inventario/actualizar-stock', [
+                    'order_detail' => $payload,
+                ]);
+
+                if (!$response->successful()) {
+                    DB::rollback();
+                    return response()->json(['error' => 'Error al actualizar el stock en el microservicio de inventario', 'mensaje' => $response->body()], $response->status());
+                }
             }
 
             $order->total = $total;
