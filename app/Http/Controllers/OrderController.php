@@ -21,7 +21,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::with('supplier', 'orderDetails')->find($id);
+        $order = Order::with('supplier', 'details')->find($id);
 
         if (!$order) {
             return response()->json(['mensaje' => 'Pedido no encontrado'], 404);
