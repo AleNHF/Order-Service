@@ -131,7 +131,7 @@ class OrderController extends Controller
                 'supplierId'
             ]));
 
-            $order->orderDetails()->delete();
+            $order->details()->delete();
 
             $total = 0;
             $quantity = 0;
@@ -139,7 +139,7 @@ class OrderController extends Controller
             $payload = [];
 
             foreach ($request->input('details') as $detail) {
-                $orderDetail = $order->orderDetails()->create([
+                $orderDetail = $order->details()->create([
                     'productId' => $detail['product_id'],
                     'quantity' => $detail['quantity'],
                     'price' => $detail['price'],
@@ -198,7 +198,7 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            $order->orderDetails()->delete();
+            $order->details()->delete();
             $order->delete();
 
             DB::commit();
